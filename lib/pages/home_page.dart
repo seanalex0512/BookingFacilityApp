@@ -58,6 +58,7 @@ class HomePage extends StatelessWidget {
                       ImageContainer(
                         imagePath: 'lib/images/tennislogo.png',
                         text: 'Tennis Court',
+
                       ),
                       SizedBox(width: 8),
                       ImageContainer(
@@ -85,16 +86,11 @@ class HomePage extends StatelessWidget {
                         imagePath: 'lib/images/discussion.png',
                         text: 'Discussion Rooms',
                       ),
-                      SizedBox(width: 8),
-                      ImageContainer(
-                        imagePath: 'lib/images/library.png',
-                        text: 'Library',
-                      ),
                     ],
                   ),
                 ],
               ),
-              SizedBox(height: 70),
+              SizedBox(height: 133),
 
               Align(
                 alignment: Alignment.bottomCenter,

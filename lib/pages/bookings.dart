@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import '../components/navigation.dart';
+import 'package:login_page/components/navigation.dart';
+import 'package:login_page/components/booking_navigation.dart';
+
 
 class Bookings extends StatelessWidget {
   const Bookings({Key? key});
@@ -47,12 +49,13 @@ class BookingsPage extends StatelessWidget {
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 20),
-                  // Sample booking-related content
 
+                  Center(
+                    child: BookingNavigation(),
+                  ),
                 ],
               ),
-              SizedBox(height: 443),
-
+              SizedBox(height: 400),
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Navigation(),
