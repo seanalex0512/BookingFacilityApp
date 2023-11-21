@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:login_page/components/confirm_booking_button.dart';
+import 'package:login_page/pages/home_page.dart';
+
 
 class SportDetailsPage extends StatefulWidget {
   final String facilityName;
@@ -120,6 +123,10 @@ class _SportDetailsPageState extends State<SportDetailsPage> {
                       ? 'Select a Date'
                       : DateFormat('yyyy-MM-dd').format(selectedDate!)),
                 ),
+              SizedBox(height: 20),
+              Center(
+                child: ConfirmBookingButton(),
+              ),
             ],
           ),
         ),
