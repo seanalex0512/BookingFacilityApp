@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:login_page/components/confirm_booking_button.dart';
 import 'package:login_page/pages/home_page.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SportDetailsPage extends StatefulWidget {
   final String facilityName;
@@ -17,6 +17,28 @@ class _SportDetailsPageState extends State<SportDetailsPage> {
   String? dropdownTimeValue;
   String? dropdownRoomValue;
   DateTime? selectedDate;
+  bool hasBooking = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Check for existing bookings when the page is initialized
+    _checkExistingBooking();
+  }
+
+  Future<void> _checkExistingBooking() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    // Use a unique key for each facility, combining facility name, time, and date
+    String bookingKey = '${widget.facilityName}_${dropdownTimeValue ?? 'defaultTime'}_${selectedDate?.toString() ?? 'defaultDate'}';
+
+    // Check if the facility has already been booked
+    bool isBooked = prefs.getBool(bookingKey) == true;
+
+    setState(() {
+      hasBooking = isBooked;
+    });
+  }
 
   Future<void> _selectDate(BuildContext context) async {
     if (widget.facilityName != 'Discussion Rooms' && widget.facilityName != 'Library') {
@@ -33,6 +55,66 @@ class _SportDetailsPageState extends State<SportDetailsPage> {
         });
       }
     }
+  }
+
+  Future<void> _confirmBooking() async {
+    // Validate the selected data before booking
+    if (widget.facilityName != 'Discussion Rooms' && dropdownTimeValue != null && selectedDate != null) {
+      // Save booking details using SharedPreferences
+      await _saveBookingDetails();
+
+      // Display booking details
+      _showBookingDetailsDialog();
+    } else {
+      // Display an error or prompt the user to fill in all required fields
+      print('Incomplete booking information');
+    }
+  }
+
+  Future<void> _saveBookingDetails() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    // Use a unique key for each facility, combining facility name, time, and date
+    String bookingKey = '${widget.facilityName}_${dropdownTimeValue ?? 'defaultTime'}_${selectedDate.toString()}';
+
+    // Check if the facility has already been booked
+    if (prefs.getBool(bookingKey) == true) {
+      print('This facility has already been booked.');
+    } else {
+      // Save booking details
+      prefs.setBool(bookingKey, true);
+      print('Booking details saved successfully.');
+    }
+  }
+
+  Future<void> _showBookingDetailsDialog() {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Booking Details'),
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Facility: ${widget.facilityName}'),
+              Text('Time: ${dropdownTimeValue}'),
+              Text('Date: ${DateFormat('yyyy-MM-dd').format(selectedDate!)}'),
+              // Add more details if needed
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.pop(context); // Navigate back to the home page
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -74,7 +156,7 @@ class _SportDetailsPageState extends State<SportDetailsPage> {
                 ),
               ),
               SizedBox(height: 20),
-              if (widget.facilityName == 'Discussion Rooms' )
+              if (widget.facilityName == 'Discussion Rooms')
                 DropdownButtonFormField<String>(
                   hint: const Text('Select a Room'),
                   value: dropdownRoomValue,
@@ -125,7 +207,19 @@ class _SportDetailsPageState extends State<SportDetailsPage> {
                 ),
               SizedBox(height: 20),
               Center(
-                child: ConfirmBookingButton(),
+                child: hasBooking
+                    ? Column(
+                  children: [
+                    Text('You have already made a booking for this facility.'),
+                    // Display additional booking details here
+                  ],
+                )
+                    : ConfirmBookingButton(
+                  onPressed: () {
+                    Navigator.pop(context); // Navigate back, adjust as needed
+                  },
+                  onSaveDetails: _confirmBooking, // Pass the _confirmBooking function here
+                ),
               ),
             ],
           ),

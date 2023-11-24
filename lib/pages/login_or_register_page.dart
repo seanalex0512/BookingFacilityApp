@@ -21,7 +21,6 @@ class _LoginOrRegisterPageState extends State<LoginOrRegisterPage> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     if (showLoginPage) {
